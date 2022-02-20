@@ -11,16 +11,14 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 const MyTask = ({task, completeTasks, removeTasks, editTasks}) => {
   const [edit, setEdit] = useState(false);
   const [newTask, setNewTask] = useState('');
-  const inputRef = useRef(null);
-  useEffect(() => {
-    inputRef.current.focus();
-  }, [edit]);
+  const [done, isDone] = useState(false);
+
   return (
     <View style={styles.item} key={task.id}>
       <View style={styles.itemLeft}>
         <TouchableOpacity
           style={styles.square}
-          onPress={() => completeTasks(task.id)}>
+          onPress={() => completeTasks(task.id, task.isComplete)}>
           {!edit && task.isComplete ? (
             <Icon name="check" size={25} color="green" />
           ) : null}
@@ -30,24 +28,24 @@ const MyTask = ({task, completeTasks, removeTasks, editTasks}) => {
           multiline={true}
           style={!edit && task.isComplete ? styles.colorText : styles.itemEdit}
           placeholder="Update your task"
-          defaultValue={task.text}
+          defaultValue={task.content}
           onChangeText={text => setNewTask(text)}
-          ref={inputRef}
           editable={edit}
+          autoFocus={edit}
         />
       </View>
+
       <View style={styles.itemRight}>
         <TouchableOpacity
           style={{paddingLeft: 10}}
           onPress={() => {
-            inputRef.current.focus();
             setEdit(!edit);
             if (edit) {
               editTasks(
                 {
-                  id: newTask,
-                  text: newTask,
+                  content: newTask,
                   isComplete: false,
+                  description: '',
                 },
                 task.id,
               );
@@ -59,6 +57,7 @@ const MyTask = ({task, completeTasks, removeTasks, editTasks}) => {
             size={30}
           />
         </TouchableOpacity>
+
         <TouchableOpacity
           style={{paddingLeft: 10}}
           onPress={() => removeTasks(task.id)}>

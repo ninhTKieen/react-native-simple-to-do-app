@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+
 import {
   View,
   Text,
@@ -8,70 +9,81 @@ import {
   Alert,
   Keyboard,
 } from 'react-native';
+
 import TaskInput from './TaskInput';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MyTask from './MyTask';
 import WaitingPage from './SplashScreen';
+
+const mockAPI = `https://6210b0334cd3049e178245b0.mockapi.io/api/todos`;
+
 const TaskList = () => {
   let storeData = [];
   const [taskItems, setTaskItems] = useState([]);
   const [isReady, setReady] = useState(false);
-  const handleAddTask = task => {
+
+  const handleAddTask = async task => {
     Keyboard.dismiss();
-    if (!task.text) {
+    if (!task.content) {
       return;
     }
-    let count = 0;
-    while (taskItems.filter(item => item.id === task.id).length) {
-      task.id += count;
-      count++;
-    }
-    const newTasks = [...taskItems, task];
-    storeData.push(...taskItems, task);
-    _storeData(storeData);
-    retrieveData();
-  };
-  const completeTasks = async id => {
-    let updateTasks = taskItems.map(task => {
-      if (task.id === id) {
-        task.isComplete = !task.isComplete;
-      }
-      return task;
-    });
-    AsyncStorage.removeItem('todos').then(_storeData(updateTasks));
-    retrieveData();
-  };
-  const removeTasks = id => {
-    let updateTasks = taskItems.filter(task => {
-      if (task.id !== id) {
-        return true;
-      }
-    });
-    AsyncStorage.removeItem('todos').then(_storeData(updateTasks));
-    retrieveData();
-  };
-  const handleDeleteAllTask = () => {
-    Alert.alert('WARNING', 'Delete all ?', [
-      {
-        text: 'Yes',
-        onPress: () => {
-          storeData = [];
-          AsyncStorage.removeItem('todos').then(_storeData(storeData));
-          retrieveData();
-        },
+    await fetch(mockAPI, {
+      method: 'POST',
+      body: JSON.stringify({
+        content: task.content,
+        description: task.description,
+        isComplete: task.isComplete,
+      }),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
       },
-      {text: 'No'},
-    ]);
-  };
-  const editTasks = (newTask, id) => {
-    if (!newTask.text) {
-      return;
-    }
-    let updateTasks = taskItems.map(item => (item.id === id ? newTask : item));
-    AsyncStorage.removeItem('todos').then(_storeData(updateTasks));
+    });
+
     retrieveData();
   };
+
+  const completeTasks = async (id, isComplete) => {
+    await fetch(mockAPI + `/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        isComplete: !isComplete,
+      }),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+    });
+    retrieveData();
+  };
+
+  const removeTasks = async id => {
+    await fetch(mockAPI + `/${id}`, {
+      method: 'DELETE',
+    });
+
+    retrieveData();
+  };
+
+  const editTasks = async (newTask, id) => {
+    if (!newTask.content) {
+      return;
+    }
+    await fetch(mockAPI + `/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        content: newTask.content,
+        description: newTask.description,
+        isComplete: newTask.isComplete,
+      }),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+    });
+
+    retrieveData();
+  };
+
   const _storeData = async (data = []) => {
     try {
       await AsyncStorage.setItem('todos', JSON.stringify(data));
@@ -79,25 +91,27 @@ const TaskList = () => {
       console.log(error);
     }
   };
+
   const retrieveData = async () => {
     try {
-      const value = await AsyncStorage.getItem('todos');
-      console.log(value);
-      if (value) {
-        console.log('set value');
-        setTaskItems(JSON.parse(value));
+      const response = await fetch(mockAPI);
+      if (response.status === 200) {
+        const data = await response.json();
+        setTaskItems(data);
       }
-      setTimeout(() => setReady(true), 1000);
     } catch (error) {
       console.log(error);
     }
   };
+
   useEffect(() => {
     retrieveData();
   }, []);
-  if (!isReady) {
-    return <WaitingPage />;
-  }
+
+  // if (!isReady) {
+  //   return <WaitingPage />;
+  // }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>

@@ -1,16 +1,24 @@
 import React, {useState, useEffect} from 'react';
-import {View, TextInput, Text, StyleSheet, Button, TouchableOpacity} from 'react-native';
+import {
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  Button,
+  TouchableOpacity,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+
 const TaskInput = props => {
   const [input, setInput] = useState('');
   const handleAddTask = () => {
     props.onChange({
-      id : input,
-      text : input,
-      isComplete : false,
-    })
+      content: input,
+      description: '',
+      isComplete: false,
+    });
     setInput('');
-  }
+  };
   return (
     <View style={styles.footer}>
       <View style={styles.inputSpace}>
@@ -20,9 +28,9 @@ const TaskInput = props => {
           value={input}
         />
       </View>
-      <TouchableOpacity onPress = {handleAddTask}>
+      <TouchableOpacity onPress={handleAddTask}>
         <View style={styles.iconAdd}>
-          <Icon name = "add" color = "white" size = {25} />
+          <Icon name="add" color="white" size={25} />
         </View>
       </TouchableOpacity>
     </View>
@@ -30,7 +38,7 @@ const TaskInput = props => {
 };
 const styles = StyleSheet.create({
   footer: {
-    flex : 0.1,
+    flex: 0.1,
     position: 'absolute',
     color: 'grey',
     bottom: 0,
