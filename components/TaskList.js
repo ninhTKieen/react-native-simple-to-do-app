@@ -4,23 +4,19 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
-  Alert,
   Keyboard,
 } from 'react-native';
 
 import TaskInput from './TaskInput';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import MyTask from './MyTask';
 import WaitingPage from './SplashScreen';
 
 const mockAPI = `https://6210b0334cd3049e178245b0.mockapi.io/api/todos`;
 
 const TaskList = () => {
-  let storeData = [];
   const [taskItems, setTaskItems] = useState([]);
   const [isReady, setReady] = useState(false);
 
@@ -33,7 +29,6 @@ const TaskList = () => {
       method: 'POST',
       body: JSON.stringify({
         content: task.content,
-        description: task.description,
         isComplete: task.isComplete,
       }),
       headers: {
@@ -73,7 +68,6 @@ const TaskList = () => {
       method: 'PUT',
       body: JSON.stringify({
         content: newTask.content,
-        description: newTask.description,
         isComplete: newTask.isComplete,
       }),
       headers: {
@@ -84,14 +78,6 @@ const TaskList = () => {
     retrieveData();
   };
 
-  const _storeData = async (data = []) => {
-    try {
-      await AsyncStorage.setItem('todos', JSON.stringify(data));
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const retrieveData = async () => {
     try {
       const response = await fetch(mockAPI);
@@ -99,6 +85,7 @@ const TaskList = () => {
         const data = await response.json();
         setTaskItems(data);
       }
+      setTimeout(() => setReady(true), 1000);
     } catch (error) {
       console.log(error);
     }
@@ -108,20 +95,16 @@ const TaskList = () => {
     retrieveData();
   }, []);
 
-  // if (!isReady) {
-  //   return <WaitingPage />;
-  // }
+  if (!isReady) {
+    return <WaitingPage />;
+  }
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.titleSpace}>Today's Tasks</Text>
-        <View>
-          <TouchableOpacity onPress={() => handleDeleteAllTask()}>
-            <Icon name="delete" size={30} color="red" />
-          </TouchableOpacity>
-        </View>
       </View>
+
       <View style={styles.body}>
         <ScrollView>
           {taskItems.map(task => {
@@ -137,6 +120,7 @@ const TaskList = () => {
           })}
         </ScrollView>
       </View>
+
       <TaskInput onChange={handleAddTask} />
     </View>
   );
@@ -146,16 +130,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+
   header: {
     paddingTop: 40,
     paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+
   body: {
     flex: 0.9,
     paddingHorizontal: 10,
   },
+
   titleSpace: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -163,4 +150,5 @@ const styles = StyleSheet.create({
     color: '#c9bebd',
   },
 });
+
 export default TaskList;

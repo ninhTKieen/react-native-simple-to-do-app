@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+
 import {
   View,
   TextInput,
@@ -11,6 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const TaskInput = props => {
   const [input, setInput] = useState('');
+
   const handleAddTask = () => {
     props.onChange({
       content: input,
@@ -19,6 +21,7 @@ const TaskInput = props => {
     });
     setInput('');
   };
+
   return (
     <View style={styles.footer}>
       <View style={styles.inputSpace}>
@@ -28,6 +31,7 @@ const TaskInput = props => {
           value={input}
         />
       </View>
+
       <TouchableOpacity onPress={handleAddTask}>
         <View style={styles.iconAdd}>
           <Icon name="add" color="white" size={25} />
@@ -36,6 +40,7 @@ const TaskInput = props => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   footer: {
     flex: 0.1,
@@ -47,6 +52,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
   },
+
   inputSpace: {
     backgroundColor: 'grey',
     flex: 0.95,
@@ -56,6 +62,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     paddingHorizontal: 20,
   },
+
   iconAdd: {
     height: 50,
     width: 50,
@@ -65,4 +72,5 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
 });
+
 export default TaskInput;

@@ -1,7 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   TextInput,
@@ -45,7 +44,6 @@ const MyTask = ({task, completeTasks, removeTasks, editTasks}) => {
                 {
                   content: newTask,
                   isComplete: false,
-                  description: '',
                 },
                 task.id,
               );
@@ -81,9 +79,7 @@ const styles = StyleSheet.create({
 
   itemRight: {
     flex: 0.2,
-    // backgroundColor : "pink",
     flexDirection: 'row',
-    // flexWrap: 'wrap',
   },
 
   itemLeft: {
@@ -113,6 +109,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
     alignItems: 'center',
   },
+  
   colorText: {
     fontSize: 20,
     color: 'green',
